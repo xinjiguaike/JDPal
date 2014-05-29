@@ -138,6 +138,7 @@ namespace JDAutoPal.Models
         public bool OpenBrowser(int BrowserIndex)
         {
             Trace.WriteLine("Rudy Trace =>OpenBrowser: Set webdriver");
+            string DriverTitle = System.Environment.CurrentDirectory;
             if (BrowserIndex == 0)
             {
                 string ProfilePath = Environment.GetEnvironmentVariable("LocalAppData") + "\\Google\\Chrome\\User Data";
@@ -146,13 +147,17 @@ namespace JDAutoPal.Models
                 Options.AddArguments("--user-data-dir=" + ProfilePath);
                 Options.AddArguments("--disable-extensions");
 
-                driver = new ChromeDriver(Options);//@"C:\Windows\System32", 
-                App.WindowHide(Globals.CHROME_DRIVER_TITLE);
+                driver = new ChromeDriver(Options);
+                DriverTitle += "\\chromedriver.exe";
+                Trace.TraceInformation("Rudy Trace =>OpenBrowser: driver = [{0}]", DriverTitle);
+
+                App.WindowHide(DriverTitle);
             }
             else if (BrowserIndex == 1)
             {
                 driver = new InternetExplorerDriver();
-                App.WindowHide(Globals.IE_DRIVER_TITLE);
+                DriverTitle += "\\IEDriverServer.exe";
+                App.WindowHide(DriverTitle);
             }
             else if (BrowserIndex == 2)
             {
@@ -676,26 +681,37 @@ namespace JDAutoPal.Models
         {
             try
             {
-                App.MouseMove(1000, 0);
-                var cbxColor = await WaitForElementAsync(Globals.COLOR_IMAGE1_XPATH, "XPath").ConfigureAwait(false);
-                cbxColor.Click();
+                Trace.TraceInformation("Rudy Trace =>PalProductAsync: Product page loading...");
+                driver.Navigate().GoToUrl(Settings.Default.ProductLink);
+                Trace.TraceInformation("Rudy Trace =>PalProductAsync: Product page load complete.");
 
-                var inputBuyNum = await WaitForElementAsync(Globals.BUY_NUM_ID, "Id").ConfigureAwait(false);
-                inputBuyNum.Clear();
-                inputBuyNum.SendKeys(SinglePalCount.ToString());
+                var btnEasyBuy = await WaitForElementAsync(Globals.BTN_EASYBUY_ID, "Id").ConfigureAwait(false);
+                btnEasyBuy.Click();
 
-                await Task.Delay(1000).ConfigureAwait(false);//Wait for 'one key buy' button load complete.
-
-                var btnBuyNow = await WaitForElementAsync(Globals.BUY_NOW_ID, "Id").ConfigureAwait(false);
-                btnBuyNow.Click();
-
-                var popUpBuyNow = await WaitForElementAsync(Globals.BUY_NOW_POPUP_ID, "Id").ConfigureAwait(false);
-                if (popUpBuyNow != null)
+                Trace.TraceInformation("Rudy Trace =>PalProductAsync: Order settle page loading...");
+                bool bRet = await WaitForPageAsync(Globals.ORDER_SETTLE_TITLE).ConfigureAwait(false);
+                if (!bRet)
                 {
-                    var btnConfirmOneKeyBuy = await WaitForElementAsync(Globals.BTN_CONFIRM_BUY_ID, "Id").ConfigureAwait(false);
-                    btnConfirmOneKeyBuy.Click();
+                    Trace.TraceInformation("Rudy Trace =>PalProductAsync: Order settle page load time out.");
+                    return false;
                 }
-                bool bRet = await WaitForPageAsync(Globals.PAYMENT_TITLE).ConfigureAwait(false);
+                
+                AsyncJavaScriptExecutor js = (AsyncJavaScriptExecutor)driver;
+                js.ExecuteScript("window.scrollTo(0,document.body.scrollHeight)", null);
+
+                await Task.Delay(3000);
+
+                var btnAddRemark = await WaitForElementAsync(Globals.BTN_ADDREMARK_CLASS, "Class").ConfigureAwait(false);
+                btnAddRemark.Click();
+
+                var inputRemark = await WaitForElementAsync(Globals.INPUT_REMARK_ID, "Id").ConfigureAwait(false);
+                inputRemark.Clear();
+                inputRemark.SendKeys(Settings.Default.Remark);
+
+                var btnSubmitOrder = await WaitForElementAsync(Globals.BTN_SUBMITORDER_ID, "Id").ConfigureAwait(false);
+                btnSubmitOrder.Click();
+
+                bRet = await WaitForPageAsync(Globals.PAYMENT_PLATFORM_TITLE).ConfigureAwait(false);
                 if (!bRet)
                     return false;
             }
@@ -708,7 +724,7 @@ namespace JDAutoPal.Models
                 Trace.TraceInformation("Rudy Exception=> PalProductAsync: " + e.Source + ";" + e.Message);
                 return false;
             }
-            Trace.TraceInformation("Rudy Trace =>Switch to payment page succeed.");
+            Trace.TraceInformation("Rudy Trace =>Switch to payment platform select page succeed.");
             return true;
         }
 
@@ -732,7 +748,7 @@ namespace JDAutoPal.Models
                 var btnNext = await WaitForElementAsync(Globals.BTN_NEXT_ID, "Id").ConfigureAwait(false);
                 btnNext.Click();
 
-                bool bRet = await WaitForPageAsync(Globals.TENPAY_TITLE).ConfigureAwait(false);
+                bool bRet = await WaitForPageAsync("").ConfigureAwait(false);
                 if (!bRet)
                     return false;
             }
@@ -912,16 +928,13 @@ namespace JDAutoPal.Models
                 return false;
             }
 
-            return true;//==========================
-
-
             bRet = await PalProductAsync().ConfigureAwait(false);
             if (!bRet)
             {
                 Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: Pal Product Failed!");
                 return false;
             }
-
+            /*
             bRet = await SelectPayPlatformAsync(Globals.RADIO_TENPAY_XPATH).ConfigureAwait(false);
             if (!bRet)
             {
@@ -935,6 +948,7 @@ namespace JDAutoPal.Models
                 Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: TenPay Failed!");
                 return false;
             }
+*/
             SuccessPalCount++;
             await RenewIpAddress();
             Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: Renew IP Finished!");

@@ -14,9 +14,8 @@ namespace JDAutoPal.Models
 
         #region======================Page Title======================
         public const string LOGGEDIN_TITLE = "京东网上商城";
-        public const string PAYMENT_TITLE = "京东网--支付中心";
-        public const string TENPAY_TITLE = "财付通 - 支付中心";
-        public const string LOGIN_PAGE_TITLE = "登录 - 京东网";
+        public const string PAYMENT_PLATFORM_TITLE = "京东支付-请选择支付方式";
+        public const string ORDER_SETTLE_TITLE = "订单结算页 -京东商城";
         #endregion
 
         #region======================Page Url========================
@@ -54,10 +53,14 @@ namespace JDAutoPal.Models
         public const string CHECK_SUBMIT_XPATH = "//a[@onclick='javascript:check_submit();return false;']";
 
         //Product Page
-        public const string COLOR_IMAGE1_XPATH = "//a[@id='cl_0']/img";
-        public const string COLOR_IMAGE2_XPATH = "//a[@id='cl_1']/img";
-        public const string COLOR_IMAGE3_XPATH = "//a[@id='cl_2']/img";
-        public const string COLOR_IMAGE4_XPATH = "//a[@id='cl_3']/img";
+        public const string BTN_EASYBUY_ID = "btn-easybuy-submit";
+
+        public const string BTN_SUBMITORDER_ID = "order-submit";
+        public const string BTN_ADDREMARK_CLASS = "toggler";
+        public const string INPUT_REMARK_ID = "remarkText";
+        /// <summary>
+        /// /////////////////////////////////////
+        /// </summary>
         public const string BUY_NUM_ID = "buy_num";
         public const string BUY_NOW_ID = "buy_now_button";
         public const string ADD_TO_CART_ID = "part_buy_button";
