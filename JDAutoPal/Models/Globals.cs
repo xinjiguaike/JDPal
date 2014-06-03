@@ -8,8 +8,6 @@ namespace JDAutoPal.Models
 {
     public class Globals
     {
-        public const string CHROME_DRIVER_TITLE = "C:\\Windows\\System32\\chromedriver.exe";
-        public const string IE_DRIVER_TITLE = "C:\\Windows\\system32\\IEDriverServer.exe";
         public const string JD_CAPTION = "京东自动拍货";
 
         #region======================Page Title======================
@@ -20,8 +18,8 @@ namespace JDAutoPal.Models
 
         #region======================Page Url========================
         public const string LOGIN_URL = "http://passport.jd.com/uc/login";
-        public const string ONEKEY_BUY_URL = "http://customer.JD.com/onekey_buy/info.php";
         public const string PRODUCT_URL = "http://item.jd.com/1137731608.html";
+        public const string EASYBUY_URL = "http://easybuy.jd.com/address/getEasyBuyList.action";
         #endregion
 
         #region======================Page Elements===================
@@ -29,44 +27,33 @@ namespace JDAutoPal.Models
         public const string LOGIN_NAME_ID = "loginname";
         public const string LOGIN_PASSWORD_ID = "nloginpwd";
         public const string LOGIN_SUBMIT_ID = "loginsubmit";
-
-        public const string BTN_ADD_ADDRESS_CLASS = "add";
-        public const string LOGIN_LINK_CLASS = "add";
         
         //Delivery Address Infomation
-        public const string SHIP_MAN_ID = "ship_man";
-        public const string SELECT_COUNTRY_ID = "country_id";
-        public const string SELECT_PROVINCE_ID = "province_id";
-        public const string SELECT_CITY_ID = "city_id";
-        public const string SELECT_TOWN_ID = "town_id";
-        public const string ADDRESS_DETAIL_ID = "addr_detail";
-        public const string ZIP_CODE_ID = "ship_zip";
-        public const string MOBILE_ID = "ship_mb";
-        public const string CONFIRM_ADDRESS_XPATH = "//a[@href='javascript:show_shipment();']";
-        public const string RADIO_NORMALSHIP_XPATH = "//input[@name='ship_type' and @value='1']";
-        public const string CONFIRM_PAYMENT_XPATH = "//a[@href='javascript:show_payment();']";
+        public const string BTN_ADD_ADDRESS_XPATH = "//a[@onclick='alertAddAddressDiag()']";
+        public const string DLG_ADDRESS_POP_ID = "addressDiagDiv";
+        public const string SHIP_MAN_ID = "consigneeName";
+        public const string SELECT_PROVINCE_ID = "provinceDiv";
+        public const string SELECT_CITY_ID = "cityDiv";
+        public const string SELECT_COUNTY_ID = "countyDiv";
+        public const string SELECT_TOWN_ID = "townDiv";
+        public const string ADDRESS_DETAIL_ID = "consigneeAddress";
+        public const string MOBILE_ID = "consigneeMobile";
+        public const string ADDRESS_ALIAS_ID = "consigneeAlias";
+        public const string BTN_SAVE_ADDRESS_XPATH = "//a[@onclick='addAddress();']";
+        public const string BTN_UPGRADE_EASYBUY_XPATH = "//div[@class='ac']/a";
 
-        public const string RADIO_NETPAY_XPATH = "//input[@name='pay_id' and @value='-1']";
-        public const string CONFIRM_INVOICE_XPATH = "//a[@href='javascript:show_invoice();']";
-
-        public const string CHB_INVOICE_ID = "no_need_invoice";
-        public const string CHECK_SUBMIT_XPATH = "//a[@onclick='javascript:check_submit();return false;']";
-
+        public const string DLG_UPGRADE_EASYBUY_ID = "paymentDiagDiv";
+        public const string RADIO_PAY_ONLINE_ID = "pay-method-1";
+        public const string RADIO_PAY_ONDELIVERY_ID = "pay-method-2";
+        public const string RADIO_PAY_ONYOURSELF_ID = "pay-method-3";
+        public const string BTN_CONFIRM_SET_CLASS = "gray-btn";
+        
         //Product Page
+        public const string INPUT_BUYNUM_ID = "buy-num";
         public const string BTN_EASYBUY_ID = "btn-easybuy-submit";
-
-        public const string BTN_SUBMITORDER_ID = "order-submit";
-        public const string BTN_ADDREMARK_CLASS = "toggler";
+        public const string BTN_ADDREMARK_XPATH = "//a[@class='toggler' and @onclick='selectRemark(this)']";
         public const string INPUT_REMARK_ID = "remarkText";
-        /// <summary>
-        /// /////////////////////////////////////
-        /// </summary>
-        public const string BUY_NUM_ID = "buy_num";
-        public const string BUY_NOW_ID = "buy_now_button";
-        public const string ADD_TO_CART_ID = "part_buy_button";
-        public const string BUY_NOW_XPATH = "//div[@class='btn_p']/a[@id='buy_now_button']";
-        public const string BUY_NOW_POPUP_ID = "div_onekey_select_pop";
-        public const string BTN_CONFIRM_BUY_ID = "onekey_select_pop_confirm";
+        public const string BTN_SUBMITORDER_ID = "order-submit";
 
         //Payment Platform page
         public const string TXT_PAYMENT_MONEY_ID = "lblAmount";

@@ -98,24 +98,24 @@ namespace JDAutoPal.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string QQAccountFile {
+        public string AccountFile {
             get {
-                return ((string)(this["QQAccountFile"]));
+                return ((string)(this["AccountFile"]));
             }
             set {
-                this["QQAccountFile"] = value;
+                this["AccountFile"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string BindQQAccountFile {
+        public string BindAccountFile {
             get {
-                return ((string)(this["BindQQAccountFile"]));
+                return ((string)(this["BindAccountFile"]));
             }
             set {
-                this["BindQQAccountFile"] = value;
+                this["BindAccountFile"] = value;
             }
         }
         

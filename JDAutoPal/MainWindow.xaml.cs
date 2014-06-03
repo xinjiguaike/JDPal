@@ -64,7 +64,7 @@ namespace JDAutoPal
 
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
-                Settings.Default.QQAccountFile = dlg.FileName;
+                Settings.Default.AccountFile = dlg.FileName;
         }
 
         private void OnStopPalling(object sender, RoutedEventArgs e)
@@ -83,7 +83,7 @@ namespace JDAutoPal
             }
         }
 
-        private void OnBrowserBindQQAccount(object sender, RoutedEventArgs e)
+        private void OnBrowserBindAccount(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.DefaultExt = ".xlsx";
@@ -91,40 +91,48 @@ namespace JDAutoPal
 
             Nullable<bool> result = dlg.ShowDialog();
             if (result == true)
-                Settings.Default.BindQQAccountFile = dlg.FileName;
+                Settings.Default.BindAccountFile = dlg.FileName;
         }
 
         private async void OnBeginBind(object sender, RoutedEventArgs e)
         {
-            if (btnBind.Content.Equals("开始绑定"))
+            if (tbBindAccount.Text.Length == 0)
             {
-                btnBind.Content = "停止绑定";
-                try
-                {
-                    await JDPal.BindAllAccountAddressAsync();
-                }
-                catch (OperationCanceledException)
-                {
-                    Trace.TraceInformation("Rudy Trace =>OnBeginBind: Bind Address Stopped.");
-                } 
+                MessageBox.Show("京东账户信息文件不能为空！", Globals.JD_CAPTION, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
-            else if (btnBind.Content.Equals("停止绑定"))
+            Trace.TraceInformation(">>>>>>>>>>>>>>>>>>>>Rudy Trace =>OnBeginBind: Address bind start<<<<<<<<<<<<<<<<<<<<");
+            JDPal.InitCTS();
+            btnBeginBind.Visibility = Visibility.Hidden;
+            btnStopBind.Content = "停止绑定";
+            btnStopBind.Visibility = Visibility.Visible;
+            try
             {
-                Trace.TraceInformation("Rudy Trace =>OnStopPalling: Stoppig bind...");
-                btnBind.Content = "正在取消...";
-                btnBind.IsEnabled = false;
-                JDPal.CancelWaitting();
+                await JDPal.BindAllAccountAddressAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                Trace.TraceInformation("Rudy Trace =>OnBeginBind: Bind Address Stopped.");
             }
 
-            btnBind.IsEnabled = true;
-            btnBind.Content = "开始绑定";
+            btnStopBind.IsEnabled = true;
+            btnStopBind.Visibility = Visibility.Hidden;
+            btnBeginBind.Visibility = Visibility.Visible;
+        }
+
+        private void OnStopBind(object sender, RoutedEventArgs e)
+        {
+            Trace.TraceInformation("Rudy Trace =>OnStopPalling: Stoppig bind...");
+            btnStopBind.Content = "正在取消...";
+            btnStopBind.IsEnabled = false;
+            JDPal.CancelWaitting();
         }
 
         private async void OnBeginPal(object sender, RoutedEventArgs e)
         {
-            if (tbQQAccount.Text.Length == 0)
+            if (tbAccount.Text.Length == 0)
             {
-                MessageBox.Show("QQ账户信息文件不能为空！", Globals.JD_CAPTION, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("京东账户信息文件不能为空！", Globals.JD_CAPTION, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (tbTenpayAccount.Text.Length == 0)
@@ -154,7 +162,8 @@ namespace JDAutoPal
                 return;
             }
                             
-            Trace.WriteLine(">>>>>>>>>>>>>>>>>>>>Rudy Trace =>OnBeginPal: Pal Start<<<<<<<<<<<<<<<<<<<<");
+            Trace.TraceInformation(">>>>>>>>>>>>>>>>>>>>Rudy Trace =>OnBeginPal: Pal Start<<<<<<<<<<<<<<<<<<<<");
+            JDPal.InitCTS();
             gdBeginPal.Visibility = Visibility.Hidden;
             gdPalling.Visibility = Visibility.Visible;
             btnStop.Content = "停止拍货";
@@ -175,9 +184,9 @@ namespace JDAutoPal
 
         private void CleanUp()
         {
-            Trace.WriteLine("Rudy Trace =>Cleaning up the environment...");
+            Trace.TraceInformation("Rudy Trace =>Cleaning up the environment...");
             JDPal.Dispose();
-            Trace.WriteLine("Rudy Trace =>Clea up done.");
+            Trace.TraceInformation("Rudy Trace =>Clea up done.");
         }
 
         private void OnReduce_Click(object sender, RoutedEventArgs e)

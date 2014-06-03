@@ -29,19 +29,18 @@ namespace JDAutoPal.Models
 {
     public struct AccountInfo
     {
-        public string QQAccount;
-        public string QQPassword;
+        public string Account;
+        public string Password;
         public string FullName;
         public string Mobile;
-        public string Country;
         public string Province;
         public string City;
+        public string County;
         public string Town;
-        public string ZipCode;
         public string DetailAddress;
     }
 
-    public struct DDAccount
+    public struct JDAccount
     {
         public string UserName;
         public string Password;
@@ -52,7 +51,7 @@ namespace JDAutoPal.Models
         //Properties
         private IWebDriver driver;
         private List<AccountInfo> aAccountInfo;
-        private List<DDAccount> aDDAccount;
+        private List<JDAccount> aJDAccount;
         private CancellationTokenSource cts;
         private string OrderMoney;
         private string OrderNo;
@@ -125,7 +124,11 @@ namespace JDAutoPal.Models
             SuccessPalCount = 0;
             LocalIpAddress = GetIpAddress();
             aAccountInfo = new List<AccountInfo>();
-            aDDAccount = new List<DDAccount>();
+            aJDAccount = new List<JDAccount>();
+        }
+
+        public void InitCTS()
+        {
             cts = new CancellationTokenSource();
         }
 
@@ -137,7 +140,7 @@ namespace JDAutoPal.Models
 
         public bool OpenBrowser(int BrowserIndex)
         {
-            Trace.WriteLine("Rudy Trace =>OpenBrowser: Set webdriver");
+            Trace.TraceInformation("Rudy Trace =>OpenBrowser: Set webdriver");
             string DriverTitle = System.Environment.CurrentDirectory;
             if (BrowserIndex == 0)
             {
@@ -296,8 +299,7 @@ namespace JDAutoPal.Models
                         {
 
                             driver.SwitchTo().Window(strWindow);
-                            Trace.TraceInformation("Rudy Trace =>WaitForPageAsync: Switch to page [{0}]", driver.Title);
-
+                            //Trace.TraceInformation("Rudy Trace =>WaitForPageAsync: Switch to page [{0}]", driver.Title);
                             if (driver.Title.Contains(PageTitle))
                             {
                                 Trace.TraceInformation("Rudy Trace =>WaitForPageAsync: Page [{0}] Load Succeed!", PageTitle);
@@ -387,8 +389,8 @@ namespace JDAutoPal.Models
                         ((Range)(ws.Cells[nRow, i])).HorizontalAlignment = XlHAlign.xlHAlignLeft;
                     }
 
-                    ws.Cells[nRow, 1] = aDDAccount[nAccountIndex].UserName;
-                    ws.Cells[nRow, 2] = aDDAccount[nAccountIndex].Password;
+                    ws.Cells[nRow, 1] = aJDAccount[nAccountIndex].UserName;
+                    ws.Cells[nRow, 2] = aJDAccount[nAccountIndex].Password;
                     if (bSuccess)
                     {
                         ws.Cells[nRow, 3] = OrderNo;
@@ -426,12 +428,12 @@ namespace JDAutoPal.Models
             return bRet;
         }
 
-        public async Task<bool> SetDDAccoutInfoAsync(string FilePath)
+        public async Task<bool> SetJDAccoutInfoAsync(string FilePath)
         {
             bool bRet = await Task.Run(() =>
             {
-                if (aDDAccount != null)
-                    aDDAccount.Clear();
+                if (aJDAccount != null)
+                    aJDAccount.Clear();
                 try
                 {
                     Application excel = new Application();
@@ -440,13 +442,13 @@ namespace JDAutoPal.Models
                     Worksheet ws = wb.ActiveSheet as Worksheet;
                     int nRowCount = ws.UsedRange.Cells.Rows.Count;//get the used rows count.
 
-                    DDAccount infoTemp;
+                    JDAccount infoTemp;
 
                     for (int i = 2; i <= nRowCount; i++)
                     {
                         infoTemp.UserName = ((Range)ws.Cells[i, 1]).Text;
                         infoTemp.Password = ((Range)ws.Cells[i, 2]).Text;
-                        aDDAccount.Add(infoTemp);
+                        aJDAccount.Add(infoTemp);
                     }
                     if (wb != null)
                         wb.Close();
@@ -460,7 +462,7 @@ namespace JDAutoPal.Models
                 catch (Exception e)
                 {
                     System.Windows.MessageBox.Show(e.Message, Globals.JD_CAPTION);
-                    Trace.TraceInformation("Rudy Exception=> SetDDAccoutInfoAsync： " + e.Source + ";" + e.Message);
+                    Trace.TraceInformation("Rudy Exception=> SetJDAccoutInfoAsync： " + e.Source + ";" + e.Message);
                     return false;
                 }
 
@@ -484,18 +486,17 @@ namespace JDAutoPal.Models
                     int nRowCount = ws.UsedRange.Cells.Rows.Count;//get the used rows count.
 
                     AccountInfo infoTemp;
-                    infoTemp.Country = "中国";
                     for (int i = 2; i <= nRowCount; i++)
                     {
-                        infoTemp.QQAccount = ((Range)ws.Cells[i, 1]).Text;
-                        infoTemp.QQPassword = ((Range)ws.Cells[i, 2]).Text;
+                        infoTemp.Account = ((Range)ws.Cells[i, 1]).Text;
+                        infoTemp.Password = ((Range)ws.Cells[i, 2]).Text;
                         infoTemp.FullName = ((Range)ws.Cells[i, 3]).Text;
                         infoTemp.Mobile = ((Range)ws.Cells[i, 4]).Text;
                         infoTemp.Province = ((Range)ws.Cells[i, 5]).Text;
                         infoTemp.City = ((Range)ws.Cells[i, 6]).Text;
-                        infoTemp.Town = ((Range)ws.Cells[i, 7]).Text;
-                        infoTemp.DetailAddress = ((Range)ws.Cells[i, 8]).Text;
-                        infoTemp.ZipCode = "310012";
+                        infoTemp.County = ((Range)ws.Cells[i, 7]).Text;
+                        infoTemp.Town = ((Range)ws.Cells[i, 8]).Text;
+                        infoTemp.DetailAddress = ((Range)ws.Cells[i, 9]).Text;
                         aAccountInfo.Add(infoTemp);
                     }
                     if (wb != null)
@@ -523,27 +524,27 @@ namespace JDAutoPal.Models
         {
             try
             {
-                Trace.WriteLine("Rudy Trace =>LoginAsync: Login page loading...");
+                Trace.TraceInformation("Rudy Trace =>LoginAsync: Login page loading...");
                 driver.Navigate().GoToUrl(Globals.LOGIN_URL);
-                Trace.WriteLine("Rudy Trace =>LoginAsync: Log in page load complete.");
+                Trace.TraceInformation("Rudy Trace =>LoginAsync: Log in page load complete.");
                 
 
                 driver.SwitchTo().Window(driver.WindowHandles.Last());
 
                 var inputUserName = await WaitForElementAsync(Globals.LOGIN_NAME_ID, "Id").ConfigureAwait(false);
-                Trace.WriteLine("Rudy Trace =>LoginAsync: input user name.");
+                Trace.TraceInformation("Rudy Trace =>LoginAsync: input user name.");
                 inputUserName.Clear();
                 inputUserName.SendKeys(Account);
 
                 var inputPassword = await WaitForElementAsync(Globals.LOGIN_PASSWORD_ID, "Id").ConfigureAwait(false);
-                Trace.WriteLine("Rudy Trace =>LoginAsync: input password.");
+                Trace.TraceInformation("Rudy Trace =>LoginAsync: input password.");
                 inputPassword.Clear();
                 inputPassword.SendKeys(Password);
 
-                await Task.Delay(3000).ConfigureAwait(false);
+                await Task.Delay(1000).ConfigureAwait(false);
 
                 var btnLogin = await WaitForElementAsync(Globals.LOGIN_SUBMIT_ID, "Id").ConfigureAwait(false);
-                Trace.WriteLine("Rudy Trace =>LoginAsync: click login button");
+                Trace.TraceInformation("Rudy Trace =>LoginAsync: click login button");
                 btnLogin.Click();
 
                 bool bRet = await WaitForPageAsync(Globals.LOGGEDIN_TITLE).ConfigureAwait(false);
@@ -569,81 +570,110 @@ namespace JDAutoPal.Models
         }
 
         public async Task<bool> BindingDeliveryAddress(AccountInfo info)
-        {
-            await PrepareEnvironmentAsync(BrowserIndex).ConfigureAwait(false);
-
-            bool bRet = OpenBrowser(BrowserIndex);
-            if (!bRet)
-            {
-                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open browser failed.");
-                return false;
-            } 
-
-            bRet = await LoginAsync(info.QQAccount, info.QQPassword).ConfigureAwait(false);
-            if (!bRet)
-            {
-                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Log in Failed!");
-                return false;
-            }
-
+        {            
             try
             {
-                driver.Navigate().GoToUrl(Globals.ONEKEY_BUY_URL);
+                await PrepareEnvironmentAsync(BrowserIndex).ConfigureAwait(false);
 
-                var btnAddAddress = await WaitForElementAsync(Globals.BTN_ADD_ADDRESS_CLASS, "Class").ConfigureAwait(false);
+                bool bRet = OpenBrowser(BrowserIndex);
+                if (!bRet)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open browser failed.");
+                    return false;
+                } 
+
+                bRet = await LoginAsync(info.Account, info.Password).ConfigureAwait(false);
+                if (!bRet)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Log in Failed!");
+                    return false;
+                }
+
+            
+                driver.Navigate().GoToUrl(Globals.EASYBUY_URL);
+
+                var btnAddAddress = await WaitForElementAsync(Globals.BTN_ADD_ADDRESS_XPATH, "XPath").ConfigureAwait(false);
                 btnAddAddress.Click();
+
+                var dlgAddressPop = await WaitForElementAsync(Globals.DLG_ADDRESS_POP_ID, "Id");
+                if(dlgAddressPop == null)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open address input dialog failed!");
+                    return false;
+                }
 
                 var inputShipMan = await WaitForElementAsync(Globals.SHIP_MAN_ID, "Id").ConfigureAwait(false);
                 inputShipMan.SendKeys(info.FullName);
 
-                var selectCountry = await WaitForElementAsync(Globals.SELECT_COUNTRY_ID, "Id").ConfigureAwait(false);
-                SelectElement seCountry = new SelectElement(selectCountry);
-                seCountry.SelectByText(info.Country);
 
-                var selectProvince = await WaitForElementAsync(Globals.SELECT_PROVINCE_ID, "Id").ConfigureAwait(false);
-                SelectElement seProvince = new SelectElement(selectProvince);
-                seProvince.SelectByText(info.Province);
+                bRet = await SelectElementByTextAsync(Globals.SELECT_PROVINCE_ID, "Id", info.Province).ConfigureAwait(false);
+                if(!bRet)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select Province failed!");
+                    return false;
+                }
 
-                var selectCity = await WaitForElementAsync(Globals.SELECT_CITY_ID, "Id").ConfigureAwait(false);
-                SelectElement seCity = new SelectElement(selectCity);
-                seCity.SelectByText(info.City);
+                bRet = await SelectElementByTextAsync(Globals.SELECT_CITY_ID, "Id", info.City).ConfigureAwait(false);
+                if (!bRet)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select City failed!");
+                    return false;
+                }
 
-                var selectTown = await WaitForElementAsync(Globals.SELECT_CITY_ID, "Id").ConfigureAwait(false);
-                SelectElement seTown = new SelectElement(selectTown);
-                seTown.SelectByText(info.Town);
+                bRet = await SelectElementByTextAsync(Globals.SELECT_COUNTY_ID, "Id", info.County).ConfigureAwait(false);
+                if (!bRet)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select County failed!");
+                    return false;
+                }
+
+                if(info.Town.Length > 0)
+                {
+                    bRet = await SelectElementByTextAsync(Globals.SELECT_CITY_ID, "Id", info.Town).ConfigureAwait(false);
+                    if (!bRet)
+                    {
+                        Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select Town failed!");
+                        return false;
+                    }
+                }
+                
 
                 var inputAddressDetail = await WaitForElementAsync(Globals.ADDRESS_DETAIL_ID, "Id").ConfigureAwait(false);
                 inputAddressDetail.SendKeys(info.DetailAddress);
 
-                var inputZipCode = await WaitForElementAsync(Globals.ZIP_CODE_ID, "Id");
-                inputZipCode.SendKeys(info.ZipCode);
-
                 var inputMobile = await WaitForElementAsync(Globals.MOBILE_ID, "Id").ConfigureAwait(false);
                 inputMobile.SendKeys(info.Mobile);
 
-                var btnConfirmAddress = await WaitForElementAsync(Globals.CONFIRM_ADDRESS_XPATH, "XPath").ConfigureAwait(false);
-                btnConfirmAddress.Click();
+                var inputAddressAlias = await WaitForElementAsync(Globals.ADDRESS_ALIAS_ID, "Id").ConfigureAwait(false);
+                inputAddressAlias.SendKeys("家庭地址");
 
-                var radioNormalShip = await WaitForElementAsync(Globals.RADIO_NORMALSHIP_XPATH, "XPath").ConfigureAwait(false);
-                if (!radioNormalShip.Selected)
-                    radioNormalShip.Click();
 
-                var btnConfirmPayment = await WaitForElementAsync(Globals.CONFIRM_PAYMENT_XPATH, "XPath").ConfigureAwait(false);
-                btnConfirmPayment.Click();
+                var btnSaveAddress = await WaitForElementAsync(Globals.BTN_SAVE_ADDRESS_XPATH, "XPath").ConfigureAwait(false);
+                btnSaveAddress.Click();
 
-                var radioNetPay = await WaitForElementAsync(Globals.RADIO_NETPAY_XPATH, "XPath").ConfigureAwait(false);
-                if (!radioNetPay.Selected)
-                    radioNetPay.Click();
+                await Task.Delay(3000).ConfigureAwait(false);
 
-                var btnConfirmInvoice = await WaitForElementAsync(Globals.CONFIRM_INVOICE_XPATH, "XPath").ConfigureAwait(false);
-                btnConfirmInvoice.Click();
+                var btnUpgradeEasyBuy = await WaitForElementAsync(Globals.BTN_UPGRADE_EASYBUY_XPATH, "XPath").ConfigureAwait(false);
+                btnUpgradeEasyBuy.Click();
+                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Button upgrade easy buy clicked!");
 
-                var cbxInvoice = await WaitForElementAsync(Globals.CHB_INVOICE_ID, "Id").ConfigureAwait(false);
-                if (!cbxInvoice.Selected)
-                    cbxInvoice.Click();
+                var dlgSetEasyBuyPop = await WaitForElementAsync(Globals.DLG_UPGRADE_EASYBUY_ID, "Id");
+                if (dlgSetEasyBuyPop == null)
+                {
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open easy buy setting dialog failed!");
+                    return false;
+                }
 
-                var btnCheckSubmit = await WaitForElementAsync(Globals.CHECK_SUBMIT_XPATH, "XPath").ConfigureAwait(false);
-                btnCheckSubmit.Click();
+                var radioPayMethod = await WaitForElementAsync(Globals.RADIO_PAY_ONLINE_ID, "Id").ConfigureAwait(false);
+                radioPayMethod.Click();
+                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Radio pay online clicked!");
+
+                await Task.Delay(1000).ConfigureAwait(false);
+                var btnConfirmUpgrade = await WaitForElementAsync(Globals.BTN_CONFIRM_SET_CLASS, "Class").ConfigureAwait(false);
+                btnConfirmUpgrade.Click();
+                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Button confirm clicked!");
+
+                await Task.Delay(3000).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -651,16 +681,45 @@ namespace JDAutoPal.Models
                 {
                     throw e;
                 }
-                Trace.TraceInformation("Rudy Exception=> BindingDeliverAddress: " + e.Message);
+                Trace.TraceInformation("Rudy Exception=> BindingDeliverAddress: {0};{1}", e.Source, e.Message);
                 return false;
             }
 
             return true;
         }
 
+        public async Task<bool> SelectElementByTextAsync(string ele_mark, string ele_flag, string ele_text, int timeout = 30)
+        {
+            var selectCounty = await WaitForElementAsync(ele_mark, ele_flag).ConfigureAwait(false);
+            bool bRet = false;  
+
+            DateTime begins = DateTime.Now;
+            TimeSpan span = DateTime.Now - begins;
+            while (span.TotalSeconds < timeout)
+            {
+                try
+                {
+                    bRet = true;
+                    SelectElement seCounty = new SelectElement(selectCounty);
+                    seCounty.SelectByText(ele_text);  
+                }
+                catch (Exception)
+                {
+                    bRet = false;
+                    span = DateTime.Now - begins;
+                    continue;
+                }
+                break;
+            }
+
+            return bRet;
+        }
+
+
+
         public async Task BindAllAccountAddressAsync()
         {
-            bool bRet = await SetAddressAccoutInfoAsync(Settings.Default.BindQQAccountFile).ConfigureAwait(false);
+            bool bRet = await SetAddressAccoutInfoAsync(Settings.Default.BindAccountFile).ConfigureAwait(false);
             if (bRet)
             {
                 Trace.TraceInformation("Rudy Trace =>Set Address Account Info Success!");
@@ -668,9 +727,13 @@ namespace JDAutoPal.Models
                 {
                     bRet = await BindingDeliveryAddress(info).ConfigureAwait(false);
                     if (bRet)
-                        Trace.TraceInformation("Rudy Trace =>Accout[{0}]Binding Success!", info.QQAccount);
+                        Trace.TraceInformation("Rudy Trace =>Accout[{0}]Binding Success!", info.Account);
                     else
-                        Trace.TraceInformation("Rudy Trace =>Accout[{0}]Binding Failed!", info.QQAccount);
+                    {
+                        Trace.TraceInformation("Rudy Trace =>Accout[{0}]Binding Failed!", info.Account);
+                        return;
+                    }
+                        
                 }
             }
             else
@@ -685,6 +748,10 @@ namespace JDAutoPal.Models
                 driver.Navigate().GoToUrl(Settings.Default.ProductLink);
                 Trace.TraceInformation("Rudy Trace =>PalProductAsync: Product page load complete.");
 
+                var inputBuyNum = await WaitForElementAsync(Globals.INPUT_BUYNUM_ID, "Id").ConfigureAwait(false);
+                inputBuyNum.Clear();
+                inputBuyNum.SendKeys(SinglePalCount.ToString());
+
                 var btnEasyBuy = await WaitForElementAsync(Globals.BTN_EASYBUY_ID, "Id").ConfigureAwait(false);
                 btnEasyBuy.Click();
 
@@ -695,13 +762,13 @@ namespace JDAutoPal.Models
                     Trace.TraceInformation("Rudy Trace =>PalProductAsync: Order settle page load time out.");
                     return false;
                 }
-                
-                AsyncJavaScriptExecutor js = (AsyncJavaScriptExecutor)driver;
-                js.ExecuteScript("window.scrollTo(0,document.body.scrollHeight)", null);
+
+                IJavaScriptExecutor js = driver as IJavaScriptExecutor;
+                js.ExecuteScript("window.scrollTo(0,document.body.scrollHeight)");
 
                 await Task.Delay(3000);
 
-                var btnAddRemark = await WaitForElementAsync(Globals.BTN_ADDREMARK_CLASS, "Class").ConfigureAwait(false);
+                var btnAddRemark = await WaitForElementAsync(Globals.BTN_ADDREMARK_XPATH, "XPath").ConfigureAwait(false);
                 btnAddRemark.Click();
 
                 var inputRemark = await WaitForElementAsync(Globals.INPUT_REMARK_ID, "Id").ConfigureAwait(false);
@@ -781,7 +848,7 @@ namespace JDAutoPal.Models
                 var btnLogin = await WaitForElementAsync(Globals.TENPAY_LOGIN_ID, "Id").ConfigureAwait(false);
                 btnLogin.Click();
 
-                Trace.WriteLine("Rudy Trace =>LoginAsync: Waitting for Ten payment page to reload...");
+                Trace.TraceInformation("Rudy Trace =>LoginAsync: Waitting for Ten payment page to reload...");
 
                 var radioBalance = await WaitForElementAsync(Globals.RADIO_BALANCEPAY_CLASS, "Class").ConfigureAwait(false);
                 if (radioBalance != null)
@@ -865,13 +932,13 @@ namespace JDAutoPal.Models
             int nCount = 1;
             bool bSuccess = false;
 
-            bool bRet = await SetDDAccoutInfoAsync(Settings.Default.QQAccountFile).ConfigureAwait(false);
+            bool bRet = await SetJDAccoutInfoAsync(Settings.Default.AccountFile).ConfigureAwait(false);
             if (bRet)
             {
                 bRet = true;//await CreateDDPalReportAsync(ReportPath).ConfigureAwait(false);
                 if (bRet)
                 {
-                    foreach (DDAccount account in aDDAccount)
+                    foreach (JDAccount account in aJDAccount)
                     {
                         bSuccess = await AutoPalProcessAsync(account.UserName, account.Password).ConfigureAwait(false);
                         bRet = await UpdateDDPalReportAsync(ReportPath, nCount, bSuccess).ConfigureAwait(false);
@@ -887,15 +954,15 @@ namespace JDAutoPal.Models
             }
             else
             {
-                Trace.TraceInformation("Rudy Trace =>AutoPalAllAccount: SetDDAccoutInfoAsync Failed!");
+                Trace.TraceInformation("Rudy Trace =>AutoPalAllAccount: SetJDAccoutInfoAsync Failed!");
             }
         }
 
         public async Task<bool> AutoPalProcessAsync(string Account, string Password)
         {
-            Trace.WriteLine("Rudy Trace =>AutoPalProcessAsync: : Prepare the environment...");
+            Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: : Prepare the environment...");
             await PrepareEnvironmentAsync(BrowserIndex);
-            Trace.WriteLine("Rudy Trace =>AutoPalProcessAsync: : Environment ready！");
+            Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: : Environment ready！");
 
             bool bRet = OpenBrowser(BrowserIndex);
             if (!bRet)
@@ -914,7 +981,7 @@ namespace JDAutoPal.Models
             //string PageTitle = driver.Title;
 
             //var linkLogin = await WaitForElementAsync(Globals.LOGIN_LINK_CLASS, "Class").ConfigureAwait(false);
-            //Trace.WriteLine("Rudy Trace =>AutoPalProcessAsync: click Login Link.");
+            //Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: click Login Link.");
             //linkLogin.Click();
 
            // bRet = await WaitForPageAsync(Globals.LOGIN_PAGE_TITLE, 30).ConfigureAwait(false);
