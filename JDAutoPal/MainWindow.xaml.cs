@@ -186,7 +186,7 @@ namespace JDAutoPal
         {
             Trace.TraceInformation("Rudy Trace =>Cleaning up the environment...");
             JDPal.Dispose();
-            Trace.TraceInformation("Rudy Trace =>Clea up done.");
+            Trace.TraceInformation("Rudy Trace =>Clean up done.");
         }
 
         private void OnReduce_Click(object sender, RoutedEventArgs e)
