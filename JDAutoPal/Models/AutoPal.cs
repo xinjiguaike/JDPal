@@ -569,7 +569,7 @@ namespace JDAutoPal.Models
             return true;
         }
 
-        public async Task<bool> BindingDeliveryAddress(AccountInfo info)
+        public async Task<bool> BindingDeliveryAddressAsync(AccountInfo info)
         {            
             try
             {
@@ -578,14 +578,14 @@ namespace JDAutoPal.Models
                 bool bRet = OpenBrowser(BrowserIndex);
                 if (!bRet)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open browser failed.");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Open browser failed.");
                     return false;
                 } 
 
                 bRet = await LoginAsync(info.Account, info.Password).ConfigureAwait(false);
                 if (!bRet)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Log in Failed!");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Log in Failed!");
                     return false;
                 }
 
@@ -598,7 +598,7 @@ namespace JDAutoPal.Models
                 var dlgAddressPop = await WaitForElementAsync(Globals.DLG_ADDRESS_POP_ID, "Id");
                 if(dlgAddressPop == null)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open address input dialog failed!");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Open address input dialog failed!");
                     return false;
                 }
 
@@ -609,21 +609,21 @@ namespace JDAutoPal.Models
                 bRet = await SelectElementByTextAsync(Globals.SELECT_PROVINCE_ID, "Id", info.Province).ConfigureAwait(false);
                 if(!bRet)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select Province failed!");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Select Province failed!");
                     return false;
                 }
 
                 bRet = await SelectElementByTextAsync(Globals.SELECT_CITY_ID, "Id", info.City).ConfigureAwait(false);
                 if (!bRet)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select City failed!");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Select City failed!");
                     return false;
                 }
 
                 bRet = await SelectElementByTextAsync(Globals.SELECT_COUNTY_ID, "Id", info.County).ConfigureAwait(false);
                 if (!bRet)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select County failed!");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Select County failed!");
                     return false;
                 }
 
@@ -632,7 +632,7 @@ namespace JDAutoPal.Models
                     bRet = await SelectElementByTextAsync(Globals.SELECT_CITY_ID, "Id", info.Town).ConfigureAwait(false);
                     if (!bRet)
                     {
-                        Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Select Town failed!");
+                        Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Select Town failed!");
                         return false;
                     }
                 }
@@ -655,23 +655,23 @@ namespace JDAutoPal.Models
 
                 var btnUpgradeEasyBuy = await WaitForElementAsync(Globals.BTN_UPGRADE_EASYBUY_XPATH, "XPath").ConfigureAwait(false);
                 btnUpgradeEasyBuy.Click();
-                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Button upgrade easy buy clicked!");
+                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Button upgrade easy buy clicked!");
 
                 var dlgSetEasyBuyPop = await WaitForElementAsync(Globals.DLG_UPGRADE_EASYBUY_ID, "Id");
                 if (dlgSetEasyBuyPop == null)
                 {
-                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Open easy buy setting dialog failed!");
+                    Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Open easy buy setting dialog failed!");
                     return false;
                 }
 
                 var radioPayMethod = await WaitForElementAsync(Globals.RADIO_PAY_ONLINE_ID, "Id").ConfigureAwait(false);
                 radioPayMethod.Click();
-                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Radio pay online clicked!");
+                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Radio pay online clicked!");
 
                 await Task.Delay(1000).ConfigureAwait(false);
                 var btnConfirmUpgrade = await WaitForElementAsync(Globals.BTN_CONFIRM_SET_CLASS, "Class").ConfigureAwait(false);
                 btnConfirmUpgrade.Click();
-                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddress: Button confirm clicked!");
+                Trace.TraceInformation("Rudy Trace =>BindingDeliveryAddressAsync: Button confirm clicked!");
 
                 await Task.Delay(3000).ConfigureAwait(false);
             }
@@ -725,7 +725,7 @@ namespace JDAutoPal.Models
                 Trace.TraceInformation("Rudy Trace =>Set Address Account Info Success!");
                 foreach (AccountInfo info in aAccountInfo)
                 {
-                    bRet = await BindingDeliveryAddress(info).ConfigureAwait(false);
+                    bRet = await BindingDeliveryAddressAsync(info).ConfigureAwait(false);
                     if (bRet)
                         Trace.TraceInformation("Rudy Trace =>Accout[{0}]Binding Success!", info.Account);
                     else
@@ -1017,7 +1017,7 @@ namespace JDAutoPal.Models
             }
 */
             SuccessPalCount++;
-            await RenewIpAddress();
+            await RenewIpAddressAsync();
             Trace.TraceInformation("Rudy Trace =>AutoPalProcessAsync: Renew IP Finished!");
             LocalIpAddress = GetIpAddress();
 
@@ -1124,7 +1124,7 @@ namespace JDAutoPal.Models
             return null;
         }
 
-        public async Task RenewIpAddress()
+        public async Task RenewIpAddressAsync()
         {
             Trace.TraceInformation("Rudy Trace =>Renewing the ip...");
             try
@@ -1132,18 +1132,18 @@ namespace JDAutoPal.Models
                 string DisconnectCMDLine = "rasdial /DISCONNECT";
                 string ConnectCMDLine = "rasdial 宽带连接 " + Settings.Default.ADSLAccount + " " + Settings.Default.ADSLPassword;
 
-                await RunCmd(DisconnectCMDLine).ConfigureAwait(false);
+                await RunCmdAsync(DisconnectCMDLine).ConfigureAwait(false);
                 await Task.Delay(5000).ConfigureAwait(false);
-                await RunCmd(ConnectCMDLine).ConfigureAwait(false);
+                await RunCmdAsync(ConnectCMDLine).ConfigureAwait(false);
                 await Task.Delay(10000).ConfigureAwait(false);//wait for the new ip configuration
             }
             catch(Exception e)
             {
-                Trace.TraceInformation("Rudy Trace =>RenewIpAddress: {0};{1}", e.Source, e.Message);
+                Trace.TraceInformation("Rudy Trace =>RenewIpAddressAsync: {0};{1}", e.Source, e.Message);
             }
         }
 
-        public async Task RunCmd(string CmdLine)
+        public async Task RunCmdAsync(string CmdLine)
         {
             await Task.Run(() =>
             {
